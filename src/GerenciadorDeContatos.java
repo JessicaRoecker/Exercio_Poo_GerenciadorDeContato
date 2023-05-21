@@ -1,6 +1,6 @@
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class GerenciadorDeContatos {
     private Map<String, String> contatos;
@@ -41,64 +41,31 @@ public class GerenciadorDeContatos {
         }
     }
 
-    public static void main(String[] args) {
-        GerenciadorDeContatos gerenciador = new GerenciadorDeContatos();
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("Selecione uma opção:");
-            System.out.println("1 - Adicionar contato");
-            System.out.println("2 - Remover contato");
-            System.out.println("3 - Buscar contato");
-            System.out.println("4 - Listar contatos");
-            System.out.println("0 - Sair");
-
-            int opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpa o buffer do Scanner
-
-            switch (opcao) {
-                case 1:
-                    System.out.println("Digite o nome do contato:");
-                    String nome = scanner.nextLine();
-                    System.out.println("Digite o número de telefone:");
-                    String numeroTelefone = scanner.nextLine();
-                    gerenciador.adicionarContato(nome, numeroTelefone);
-                    break;
-                case 2:
-                    System.out.println("Digite o nome do contato a ser removido:");
-                    String nomeRemover = scanner.nextLine();
-                    gerenciador.removerContato(nomeRemover);
-                    break;
-                case 3:
-                    System.out.println("Digite o nome do contato a ser buscado:");
-                    String nomeBuscar = scanner.nextLine();
-                    try {
-                        gerenciador.buscarContato(nomeBuscar);
-                    } catch (ContatoNaoEncontradoException e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-                case 4:
-                    gerenciador.listarContatos();
-                    break;
-                case 0:
-                    System.out.println("Encerrando programa...");
-                    scanner.close();
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Opção inválida.");
-                    break;
-            }
+    public void gravarContatos() {
+        try {
+            FileOutputStream fileOut = new FileOutputStream("contatos.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(contatos);
+            out.close();
+            fileOut.close();
+            System.out.println("Contatos gravados com sucesso.");
+        } catch (IOException e) {
+            System.out.println("Erro ao gravar contatos: " + e.getMessage());
         }
     }
-}
 
-class ContatoNaoEncontradoException extends Exception {
-    public ContatoNaoEncontradoException(String mensagem) {
-        super(mensagem);
+    public void lerContatos() {
+        try {
+            FileInputStream fileIn = new FileInputStream("contatos.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            contatos = (Map<String, String>) in.readObject();
+            in.close();
+            fileIn.close();
+            System.out.println("Contatos lidos com sucesso.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erro ao ler contatos: " + e.getMessage());
+        }
     }
+
 }
-
-
 
